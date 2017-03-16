@@ -27,16 +27,16 @@ var system = require('system');
  * @param onReady what to do when testFx condition is fulfilled,
  * it can be passed in as a string (e.g.: "1 == 1" or "$('#bar').is(':visible')" or
  * as a callback function.
- * @param timeOutMillis the max amount of time to wait. If not specified, 3 sec is used.
+ * @param timeOutMillis the max amount of time to wait. If not specified, 4 sec is used.
  */
-function waitFor(testFx, onReady, timeOutMillis) {
-    var maxtimeOutMillis = timeOutMillis ? timeOutMillis : 3001, //< Default Max Timeout is 3s
+function waitFor(testFx, onReady) {
+    var maxtimeOutMillis = 4000, //< Default Max Timeout is 4s
         start = new Date().getTime(),
         condition = false,
         interval = setInterval(function() {
             if ( (new Date().getTime() - start < maxtimeOutMillis) && !condition ) {
                 // If not time-out yet and condition not yet fulfilled
-                condition = (typeof(testFx) === "string" ? eval(testFx) : testFx()); //< defensive code
+                condition = testFx();
             } else {
                 if(!condition) {
                     // If condition still not fulfilled (timeout but condition is 'false')
@@ -45,7 +45,7 @@ function waitFor(testFx, onReady, timeOutMillis) {
                 } else {
                     // Condition fulfilled (timeout and/or condition is 'true')
                     console.log("'waitFor()' finished in " + (new Date().getTime() - start) + "ms.");
-                    typeof(onReady) === "string" ? eval(onReady) : onReady(); //< Do what it's supposed to do once the condition is fulfilled
+                    onReady(); //< Do what it's supposed to do once the condition is fulfilled
                     clearInterval(interval); //< Stop this interval
                 }
             }
@@ -72,7 +72,7 @@ page.open(system.args[1], function(status){
     } else {
         waitFor(function(){
             return page.evaluate(function(){
-                return document.body.querySelector('.symbolSummary .pending') === null && document.body.querySelector('.jasmine-results') !== null
+                return document.body.querySelector('.symbolSummary .jasmine-pending') === null && document.body.querySelector('.jasmine-results') !== null
             });
         }, function(){
             var exitCode = page.evaluate(function(){

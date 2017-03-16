@@ -5,5 +5,6 @@
 var page = require('webpage').create();
 page.open('https://google.com/', function() {
     page.render('google.jpg');
+    console.log("Done!");
     phantom.exit();
 });
